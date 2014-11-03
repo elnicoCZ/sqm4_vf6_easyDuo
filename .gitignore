@@ -1,0 +1,6 @@
+linux/debug/*
+linux/release/*
+linux/EasyDuo
+linux/Makefile*
+linux/ui_*.h
+

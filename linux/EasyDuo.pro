@@ -2,10 +2,13 @@ TEMPLATE = app
 TARGET = EasyDuo
 QT += core \
     gui
-HEADERS += network.h \
+HEADERS += config.h \
+    network.h \
     easyduo.h
-SOURCES += network.cpp \
+SOURCES += config.cpp \
+    network.cpp \
     main.cpp \
     easyduo.cpp
 FORMS += easyduo.ui
 RESOURCES += 
+LIBS += -lconfig++

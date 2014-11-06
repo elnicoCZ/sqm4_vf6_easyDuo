@@ -36,7 +36,8 @@ void EasyDuo::play (void)
       ui.cbxMedia->currentIndex(),
       ui.cbxMedia->currentText().toStdString().c_str(),
       ui.cbxMedia->itemData(ui.cbxMedia->currentIndex()).toString().toStdString().c_str());
-  m_pEasyPlayer->play(ui.cbxMedia->itemData(ui.cbxMedia->currentIndex()).toString());
+  m_pEasyPlayer->play(ui.cbxMedia->itemData(ui.cbxMedia->currentIndex()).toString(),
+                      ui.chbxLoop->isChecked());
 }
 
 //******************************************************************************

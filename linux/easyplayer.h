@@ -15,11 +15,13 @@ public:
     EasyPlayer(QWidget *parent = 0);
     ~EasyPlayer();
 
-    void play (const QString & sPipeline);
+    void play (const QString & sPipeline, bool bLoop = false);
 
 protected:
     QTimer  m_qTimer;
+    QString m_sPipeline;
     pid_t   m_gstPid;
+    bool    m_bLoop;
 
     pid_t execGst (const QString & sPipeline);
 

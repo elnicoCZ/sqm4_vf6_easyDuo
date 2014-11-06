@@ -34,9 +34,12 @@ EasyPlayer::~EasyPlayer()
 
 //******************************************************************************
 
-void EasyPlayer::play (const QString & sPipeline)
+void EasyPlayer::play (const QString & sPipeline, bool bLoop)
 {
   this->showFullScreen();
+
+  m_sPipeline = sPipeline;
+  m_bLoop     = bLoop;
 
   m_gstPid = this->execGst(sPipeline);
   if (-1 == m_gstPid) {
@@ -95,6 +98,7 @@ void EasyPlayer::execute (const char * sFilename, const char * sArguments)
 void EasyPlayer::killGst (void)
 {
   if (-1 != m_gstPid) kill(m_gstPid, SIGINT);
+  m_bLoop = false;
 }
 
 //******************************************************************************
@@ -108,7 +112,12 @@ void EasyPlayer::checkGst (void)
       printf("EasyPlayer::checkGst: STOPING! %d\n", m_gstPid);
       m_gstPid = -1;
       m_qTimer.stop();
-      this->close();
+
+      if (m_bLoop) {
+        this->play(m_sPipeline, m_bLoop);
+      } else {
+        this->close();
+      }
     }
   }
 }

@@ -49,7 +49,7 @@ int config_loadMedia (QComboBox & oCombo, const char * sFilename)
 
       oCombo.addItem(sName.c_str(), sPipeline.c_str());
     }
-  } catch(const SettingNotFoundException & e) {
+  } catch (const SettingNotFoundException & e) {
     // ignore
   }
 

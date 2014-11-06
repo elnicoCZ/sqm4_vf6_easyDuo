@@ -843,8 +843,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>356</x>
-     <y>200</y>
+     <x>468</x>
+     <y>260</y>
     </hint>
     <hint type="destinationlabel">
      <x>239</x>
@@ -852,5 +852,24 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>btnPlay</sender>
+   <signal>clicked()</signal>
+   <receiver>EasyDuoClass</receiver>
+   <slot>play()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>346</x>
+     <y>133</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>227</x>
+     <y>157</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>play()</slot>
+ </slots>
 </ui>

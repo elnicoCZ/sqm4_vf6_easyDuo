@@ -17,9 +17,14 @@ public:
 private:
     Ui::EasyDuoClass    ui;
     EasyPlayer        * m_pEasyPlayer;
+    QTimer              m_qTimer;
+
+    static void cbxItemEnable(QComboBox & qCombo, int idx, bool bEnable);
+    static bool fileExists(const char * sFilename);
 
 private slots:
     void play();
+    void refresh();
 
 };
 

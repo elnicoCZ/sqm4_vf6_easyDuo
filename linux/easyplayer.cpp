@@ -105,11 +105,9 @@ void EasyPlayer::killGst (void)
 
 void EasyPlayer::checkGst (void)
 {
-  printf("EasyPlayer::checkGst: %d\n", m_gstPid);
   if (-1 != m_gstPid) {
     if (waitpid(m_gstPid, NULL, WNOHANG) > 0) {
       // the process does not exist any more
-      printf("EasyPlayer::checkGst: STOPING! %d\n", m_gstPid);
       m_gstPid = -1;
       m_qTimer.stop();
 

@@ -25,6 +25,7 @@ private:
 private slots:
     void play();
     void refresh();
+    void mute (bool bMute);
 
 };
 

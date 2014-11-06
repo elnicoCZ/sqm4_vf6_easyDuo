@@ -654,20 +654,34 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_3">
                <item>
-                <widget class="QCheckBox" name="chbxLoop">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="focusPolicy">
-                  <enum>Qt::TabFocus</enum>
-                 </property>
-                 <property name="text">
-                  <string>Loop</string>
-                 </property>
-                </widget>
+                <layout class="QVBoxLayout" name="verticalLayout_6">
+                 <item>
+                  <widget class="QCheckBox" name="chbxMute">
+                   <property name="focusPolicy">
+                    <enum>Qt::TabFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>Mute</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="chbxLoop">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="focusPolicy">
+                    <enum>Qt::TabFocus</enum>
+                   </property>
+                   <property name="text">
+                    <string>Loop</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
                <item>
                 <widget class="QPushButton" name="btnPlay">
@@ -933,8 +947,8 @@
    <slot>play()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>346</x>
-     <y>133</y>
+     <x>449</x>
+     <y>134</y>
     </hint>
     <hint type="destinationlabel">
      <x>227</x>
@@ -942,8 +956,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>chbxMute</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>EasyDuoClass</receiver>
+   <slot>mute(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>297</x>
+     <y>128</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>244</x>
+     <y>166</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>play()</slot>
+  <slot>mute(bool)</slot>
  </slots>
 </ui>

@@ -98,4 +98,5 @@
 		<pathentry base-path="/opt/vybrid/sdk-eb/twr_vf600/toolchain/include" include="gstreamer-0.10" kind="inc" path="" system="true"/>
 		<pathentry base-path="/opt/vybrid/sdk-eb/twr_vf600/toolchain/include" include="protocols" kind="inc" path="" system="true"/>
 	</storageModule>
+	<storageModule moduleId="refreshScope"/>
 </cproject>

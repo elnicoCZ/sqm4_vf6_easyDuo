@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "network.h"
+#include "alsa.h"
 
 #include <unistd.h>
 
@@ -85,6 +86,13 @@ void EasyDuo::cbxItemEnable(QComboBox & qCombo, int idx, bool bEnable)
 bool EasyDuo::fileExists(const char * sFilename)
 {
   return (access(sFilename, F_OK) != -1);
+}
+
+//******************************************************************************
+
+void EasyDuo::mute (bool bMute)
+{
+  alsa_muteSpeaker(bMute);
 }
 
 //******************************************************************************

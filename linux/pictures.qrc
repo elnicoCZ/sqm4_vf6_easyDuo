@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="webcam">pictures/gnome-camera-32.png</file>
+        <file alias="play">pictures/gnome-media-playback-start-32.png</file>
+        <file alias="movie">pictures/gnome-video-32.png</file>
+        <file alias="ledgreen">pictures/led-green-16.png</file>
+        <file alias="ledorange">pictures/led-orange-16.png</file>
+        <file alias="ledred">pictures/led-red-16.png</file>
+    </qresource>
+</RCC>

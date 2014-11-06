@@ -431,6 +431,9 @@
     </disabled>
    </palette>
   </property>
+  <property name="cursor">
+   <cursorShape>BlankCursor</cursorShape>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -640,6 +643,12 @@
                <property name="styleSheet">
                 <string notr="true"/>
                </property>
+               <property name="iconSize">
+                <size>
+                 <width>24</width>
+                 <height>24</height>
+                </size>
+               </property>
               </widget>
              </item>
              <item>
@@ -684,7 +693,17 @@
                   <enum>Qt::TabFocus</enum>
                  </property>
                  <property name="text">
-                  <string>Play</string>
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="pictures.qrc">
+                   <normaloff>:/icons/play</normaloff>:/icons/play</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>32</width>
+                   <height>32</height>
+                  </size>
                  </property>
                 </widget>
                </item>
@@ -749,7 +768,17 @@
                 <enum>Qt::TabFocus</enum>
                </property>
                <property name="text">
-                <string>On</string>
+                <string> On</string>
+               </property>
+               <property name="icon">
+                <iconset resource="pictures.qrc">
+                 <normaloff>:/icons/ledgreen</normaloff>:/icons/ledgreen</iconset>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="autoExclusive">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -765,7 +794,17 @@
                 <enum>Qt::TabFocus</enum>
                </property>
                <property name="text">
-                <string>Off</string>
+                <string> Off</string>
+               </property>
+               <property name="icon">
+                <iconset resource="pictures.qrc">
+                 <normaloff>:/icons/ledred</normaloff>:/icons/ledred</iconset>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="autoExclusive">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -781,7 +820,20 @@
                 <enum>Qt::TabFocus</enum>
                </property>
                <property name="text">
-                <string>Auto</string>
+                <string> Auto</string>
+               </property>
+               <property name="icon">
+                <iconset resource="pictures.qrc">
+                 <normaloff>:/icons/ledorange</normaloff>:/icons/ledorange</iconset>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+               <property name="autoExclusive">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -854,7 +906,9 @@
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="pictures.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>btnExit</sender>

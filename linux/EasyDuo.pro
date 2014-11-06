@@ -13,5 +13,5 @@ SOURCES += easyplayer.cpp \
     easyduo.cpp
 FORMS += easyplayer.ui \
     easyduo.ui
-RESOURCES += 
+RESOURCES += pictures.qrc
 LIBS += -lconfig++

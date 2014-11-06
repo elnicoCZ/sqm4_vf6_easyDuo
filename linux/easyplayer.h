@@ -1,6 +1,7 @@
 #ifndef EASYPLAYER_H
 #define EASYPLAYER_H
 
+#include <QtGui>
 #include <QtGui/QMainWindow>
 #include "ui_easyplayer.h"
 
@@ -17,7 +18,8 @@ public:
     void play (const QString & sPipeline);
 
 protected:
-    pid_t m_gstPid;
+    QTimer  m_qTimer;
+    pid_t   m_gstPid;
 
     pid_t execGst (const QString & sPipeline);
 
@@ -28,6 +30,7 @@ private:
 
 private slots:
     void killGst (void);
+    void checkGst (void);
 
 };
 

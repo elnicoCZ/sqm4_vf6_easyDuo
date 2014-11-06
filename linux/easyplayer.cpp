@@ -13,6 +13,7 @@
 
 #define CMD_MAXLEN                      500
 #define CMD_MAXARGS                     40
+#define TIMER_DELAY                     100
 
 //******************************************************************************
 
@@ -20,6 +21,8 @@ EasyPlayer::EasyPlayer (QWidget *parent)
     : QMainWindow(parent)
 {
 	ui.setupUi(this);
+
+  connect(&m_qTimer, SIGNAL(timeout()), this, SLOT(checkGst()));
 }
 
 //******************************************************************************
@@ -41,6 +44,8 @@ void EasyPlayer::play (const QString & sPipeline)
   } else {
     printf("EasyPlayer: Gst process pid=%d\n", m_gstPid);
   }
+
+  m_qTimer.start(TIMER_DELAY);
 }
 
 //******************************************************************************
@@ -90,8 +95,22 @@ void EasyPlayer::execute (const char * sFilename, const char * sArguments)
 void EasyPlayer::killGst (void)
 {
   if (-1 != m_gstPid) kill(m_gstPid, SIGINT);
-  wait(NULL);
-  this->close();
+}
+
+//******************************************************************************
+
+void EasyPlayer::checkGst (void)
+{
+  printf("EasyPlayer::checkGst: %d\n", m_gstPid);
+  if (-1 != m_gstPid) {
+    if (waitpid(m_gstPid, NULL, WNOHANG) > 0) {
+      // the process does not exist any more
+      printf("EasyPlayer::checkGst: STOPING! %d\n", m_gstPid);
+      m_gstPid = -1;
+      m_qTimer.stop();
+      this->close();
+    }
+  }
 }
 
 //******************************************************************************

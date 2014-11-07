@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<iarUserArgVars>
+  <group active="true" name="Libraries"/>
+  <group active="true" name="Project">
+    <variable>
+      <name>BOARD</name>
+      <value>eb</value>
+    </variable>
+    <variable>
+      <name>PROJ_ROOT</name>
+      <value>$WS_DIR$\..\..\\</value>
+    </variable>
+    <variable>
+      <name>ESL_CONFIG_DIR</name>
+      <value>$PROJ_ROOT$</value>
+    </variable>
+    <variable>
+      <name>ESL_OUTPUT_DIR</name>
+      <value>$PROJ_ROOT$\libesl</value>
+    </variable>
+  </group>
+</iarUserArgVars>
+
+

@@ -1,6 +1,16 @@
+*~
+Thumbs.db
+
 linux/debug/*
 linux/release/*
 linux/EasyDuo
 linux/Makefile*
 linux/ui_*.h
 
+mqx/**/*.o
+mqx/**/*.d
+mqx/**/*.args
+mqx/iar/**/sqm4vf6_eb_m4/*
+mqx/iar/**/settings/*
+mqx/**/*.dep
+mqx/**/*.tmp

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$\easyDuo_sqm4vf6_eb_m4.ewp</path>
+  </project>
+  <project>
+    <path>$ESL_ROOT$\lib\iar\esl_lib.ewp</path>
+  </project>
+  <batchBuild/>
+</workspace>
+
+

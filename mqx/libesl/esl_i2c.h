@@ -13,6 +13,9 @@
  *  @copyright  Elnico Ltd. All rights reserved.
  *  @author     Petr Kubiznak <kubiznak.petr@elnico.cz>
  *
+ *  @version    2.2 2014-11-07: Petr Kubiznak <kubiznak.petr@elnico.cz>
+ *                              core_mutex locking option added for VF6.
+ *
  *  @version    2.1 2014-01-29: Petr Kubiznak <kubiznak.petr@elnico.cz>
  *                              Header updated (responsibility, license).
  *
@@ -64,9 +67,10 @@
 typedef struct esl_i2c_channel_struct {
   MQX_FILE_PTR    pChannelFile;                             //!< FIO handle.
   LWSEM_STRUCT    lwsem;                                    //!< Exclusive channel usage semaphore.
-  char            asNames[2][ESL_I2C_CHANNELNAMEMAXLEN];    //!< Channel names (IRQ, POLLED).
-  uint_8          u8DriverMode;                             //!< Driver mode. Equals index of the used channel name.
   uint_32         u32BaudRate;                              //!< Channel baud rate.
+  char            asNames[2][ESL_I2C_CHANNELNAMEMAXLEN];    //!< Channel names (IRQ, POLLED).
+  uint_8          u8Number;                                 //!< Channel number.
+  uint_8          u8DriverMode;                             //!< Driver mode. Equals index of the used channel name.
   uint_8          u8Mode;                                   //!< Channel mode (I2C_MODE_MASTER / I2C_MODE_SLAVE).
   uint_8          u8Cnt;                                    //!< Number of devices open on that channel.
 } ESL_I2C_TChannel;

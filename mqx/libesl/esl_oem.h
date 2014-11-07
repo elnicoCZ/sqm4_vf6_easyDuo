@@ -34,8 +34,8 @@
 
 //******************************************************************************
 
-#define ESL_VERSION                     1007
-#define ESL_VERSION_TXT                 "1.007"
+#define ESL_VERSION                     1008
+#define ESL_VERSION_TXT                 "1.008"
 
 #define ESL_VERSION_MAJOR               ((ESL_VERSION) / 1000)
 #define ESL_VERSION_MINOR               ((ESL_VERSION) % 1000)

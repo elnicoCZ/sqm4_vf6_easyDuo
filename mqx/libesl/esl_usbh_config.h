@@ -10,7 +10,7 @@
  *
  *  @version    1.2 2014-10-07: Jan Kubiznak <kubiznak.jan@elnico.cz>
  *                              Warning for Bug #181 added.
- *  
+ *
  *  @version    1.1 2014-10-03: Jan Kubiznak <kubiznak.jan@elnico.cz>
  *                              Module released.
  *
@@ -44,7 +44,9 @@
 //******************************************************************************
 
 /** @def ESL_USBH_MODULE_ENABLE
- * @brief Set 1/0 to get module enabled or disabled. */
+ * @brief Set 1/0 to get module enabled or disabled.
+ * @warning To enable the USB Host functionalities it's also necessary to
+ * enable the needed USB Host classes (see bellow). */
 #ifndef ESL_USBH_MODULE_ENABLE
 # define ESL_USBH_MODULE_ENABLE               (0)
 #endif
@@ -85,6 +87,13 @@
 // USB Host MSD configuration
 //******************************************************************************
 
+/** @def ESL_USBH_MSD_PORTCNT
+ * @brief Count of USB ports, which CPU supports and at the same time should
+ * be used for the USB MSD functionality. */
+#ifndef ESL_USBH_MSD_PORTCNT
+# define ESL_USBH_MSD_PORTCNT                 (1)
+#endif
+
 /** @def ESL_USBH_MSD_MAXDEVCNT
  * @brief Supported count of USB MSD devices.
  * @warning Bug #181: The maximal amount of file systems (nand, sd, usb, ...) is
@@ -119,30 +128,6 @@
  * IO subsystem. */
 #ifndef ESL_USBH_MSD_FS_NAME
 # define ESL_USBH_MSD_FS_NAME                 "usbfs"
-#endif
-
-/** @def ESL_USBH_MSD_POWER_PIN
- * @brief LWGPIO Power pin. */
-#ifndef ESL_USBH_MSD_POWER_PIN
-# define ESL_USBH_MSD_POWER_PIN               (LWGPIO_PORT_D | LWGPIO_PIN6)
-#endif
-
-/** @def ESL_USBH_MSD_POWER_MUX_GPIO
- * @brief LWGPIO Power multiplexor. */
-#ifndef ESL_USBH_MSD_POWER_MUX_GPIO
-# define ESL_USBH_MSD_POWER_MUX_GPIO          (LWGPIO_MUX_D6_GPIO)
-#endif
-
-/** @def ESL_USBH_MSD_POWER_ON
- * @brief Mapping of the "Power On" state to the HW pin level. */
-#ifndef ESL_USBH_MSD_POWER_ON
-# define ESL_USBH_MSD_POWER_ON                (LWGPIO_VALUE_HIGH)
-#endif
-
-/** @def ESL_USBH_MSD_POWER_OFF
- * @brief Mapping of the "Power Off" state to the HW pin level. */
-#ifndef ESL_USBH_MSD_POWER_OFF
-# define ESL_USBH_MSD_POWER_OFF               (LWGPIO_VALUE_LOW)
 #endif
 
 //******************************************************************************

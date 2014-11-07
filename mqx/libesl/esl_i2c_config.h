@@ -9,6 +9,9 @@
  *  @copyright  Elnico Ltd. All rights reserved.
  *  @author     Petr Kubiznak <kubiznak.petr@elnico.cz>
  *
+ *  @version    2.2 2014-11-07: Petr Kubiznak <kubiznak.petr@elnico.cz>
+ *                              core_mutex locking option added for VF6.
+ *
  *  @version    2.1 2014-01-29: Petr Kubiznak <kubiznak.petr@elnico.cz>
  *                              Header updated (responsibility, license).
  *
@@ -51,6 +54,16 @@
  * @brief Maximum length of the i2c channel names (e.g. "ii2c0:"). */
 #ifndef ESL_I2C_CHANNELNAMEMAXLEN
 # define ESL_I2C_CHANNELNAMEMAXLEN      (10)
+#endif
+
+/** @def ESL_I2C_COREMUTEX_I2C_CHANNEL
+ * @brief I2C channel to use the core_mutex API as mutual access mechanism.
+ *        Use values of ESL_I2C0_NO, ESL_I2C1_NO, ESL_I2C2_NO and ESL_I2C3_NO.
+ *        Any other value turns off this feature.
+ *        This is only applicable on VF6. Also note core_mutex API provides
+ *        blocking calls only without timeout; timeouts are hence ignored. */
+#ifndef ESL_I2C_COREMUTEX_I2C_CHANNEL
+# define ESL_I2C_COREMUTEX_I2C_CHANNEL  (-1)
 #endif
 
 //******************************************************************************

@@ -30,4 +30,6 @@
 #define ESL_I2C_MODULE_ENABLE           (1)
 #define ESL_I2C_MMA845XQ_MODULE_ENABLE  (1)
 
+#define ESL_I2C_COREMUTEX_I2C_CHANNEL   (0)
+
 #endif // ESL_CONFIG_H //

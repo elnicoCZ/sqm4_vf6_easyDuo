@@ -9,6 +9,10 @@
  *  @copyright  Elnico Ltd. All rights reserved.
  *  @author     Jan Kubiznak <kubiznak.petr@elnico.cz>
  *
+ *  @version    1.2 2014-10-16: Jan Kubiznak <kubiznak.jan@elnico.cz>
+ *                              Bugfix #183: umount performs all uninstallation
+ *                              steps even one of them fails.
+ *
  *  @version    1.1 2014-10-03: Jan Kubiznak <kubiznak.jan@elnico.cz>
  *                              Module released.
  *
@@ -36,18 +40,10 @@
 
 //******************************************************************************
 
+#include <lwgpio.h>
+#include <usb_bsp.h>
+
 #include "esl_usbh_config.h"
-
-//******************************************************************************
-// Platform check - available for K70 only
-//******************************************************************************
-
-#if ((ESL_USBH_MODULE_ENABLE) && (ESL_USBH_CLASS_MSD)) && \
-    ((MQX_CPU != PSP_CPU_MK70F120M) && (MQX_CPU != PSP_CPU_MK70F150M))
-# warning "USBHMSD module is only available for Kinetis K70 CPU"
-# undef ESL_USBH_CLASS_MSD
-# define ESL_USBH_CLASS_MSD           (0)
-#endif // USBH && !K70 //
 
 //******************************************************************************
 // Module specific log IDs
@@ -77,11 +73,13 @@ enum {
   ESL_USBH_MSD_LWSEM_POLL,
   ESL_USBH_MSD_LWSEM_WAIT_TICKS,
   ESL_USBH_MSD_DEVICE_DETACHED,
+  ESL_USBH_MSD_UMOUNT_FAILED,
+  ESL_USBH_MSD_GPIO_NOT_INITIALIZED,
   ESL_USBH_MSD_MODULE_OFF
 };
 
 //******************************************************************************
-// State information
+// Module public definitions
 //******************************************************************************
 
 #define ESL_USBH_MSD_STATE_DETACHED        (0)                                  //!< USB MSD State: Detached, i.e. not connected.
@@ -89,17 +87,34 @@ enum {
 #define ESL_USBH_MSD_STATE_INTERFACED      (2)                                  //!< USB MSD State: Interfaced, i.e. connected and FS installed.
 #define ESL_USBH_MSD_STATE_NEEDFORMAT      (3)                                  //!< USB MSD State: NeedFormat, i.e. FS of connected USB is not accessible, device needs to be formatted.
 
+#define ESL_USBH_MSD_LABEL_NAMELEN         (12)                                 //!< Device label name length (from IO_IOCTL_GET_VOLUME)
+
+//******************************************************************************
+// Module public types
+//******************************************************************************
+
+/** USB configuration structure. */
+typedef struct {
+  USB_HOST_IF_STRUCT   * poUsbPort;                                             //!< Pointer to the USB Port interface structure.
+  LWGPIO_PIN_ID          lwPowerPinId;                                          //!< Power pin LWGPIO id (CPU pin). Use 0 if your HW doesn't control USB power.
+  uint32_t               u32PowerPinMux;                                        //!< Power pin LWGPIO mux to set. Use 0 if your HW doesn't control USB power.
+  LWGPIO_VALUE           lwPowerPinVal;                                         //!< Power pin LWGPIO initial value to set by ESL. Use 0 if your HW doesn't control USB power.
+} esl_usbhmsd_config;
+
 /** Module state information structure. */
 typedef struct {
-  uint8_t              u8State;                                                 //!< If USB device is inserted or not.
-  uint8_t              u8Updated;                                               //!< If the USB device state was updated.
+  uint8_t                u8State;                                               //!< If USB device is inserted or not.
+  uint8_t                u8Updated;                                             //!< If the USB device state was updated.
 } esl_usbhmsd_state;
 
 //******************************************************************************
-// State information
+// Module public global variables.
 //******************************************************************************
 
-#define ESL_USBH_MSD_LABEL_NAMELEN         (12)                                 //!< Device label name length (from IO_IOCTL_GET_VOLUME)
+/** @var esl_usbhmsd_config esl_keyboard_aoConfigs[ESL_USBH_MSD_PORTCNT]
+ * @brief The array of USB configurations is supposed to be defined by the
+ * application. */
+extern esl_usbhmsd_config esl_keyboard_aoConfigs[ESL_USBH_MSD_PORTCNT];
 
 //******************************************************************************
 // Module public functions.
@@ -174,6 +189,16 @@ const char * esl_usbhmsd_getDriveName (uint8_t u8DevIdx, _mqx_uint * err);
 uint8_t esl_usbhmsd_getDriveLabel (char       (* psLabel)[ESL_USBH_MSD_LABEL_NAMELEN],
                                    uint8_t       u8DevIdx,
                                    _mqx_uint   * err);
+
+/** Controls the USB port power. For a proper functionality the application
+ * must also specify the pin(s) in esl_keyboard_aoConfigs[] correctly. It should
+ * also be ensured, that this function is called after the usbhmsd_task() is
+ * initialized - because the GPIO configuration is a part of it.
+ * @param [in]  u8PortIdx  Index of a USB port in esl_keyboard_aoConfigs[].
+ * @param [in]  lwVal      LWGPIO value to set the power ON/OFF.
+ * @return                 ESL_USBH_MSD_OK on success, other ESL_USBH_MSD_*
+ *                         value on failure. */
+uint8_t esl_usbhmsd_powerCtrl (uint8_t u8PortIdx, LWGPIO_VALUE lwVal);
 
 //******************************************************************************
 #endif //ESL_USBH_MSD_H_54312345732123454754234571

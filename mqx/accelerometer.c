@@ -27,7 +27,7 @@
  *
  ******************************************************************************/
 
-#include "easyDuo.h"
+#include "accelerometer.h"
 #include "i2cs.h"
 
 #include "esl_appctrl.h"
@@ -40,7 +40,7 @@
 //******************************************************************************
 //******************************************************************************
 
-void tskAccel (uint_32 initialData)
+void accel_task (uint_32 initialData)
 {
   ESL_I2C_MMA845XQ_TDevice  hAccelDevice;
   ESL_I2C_MMA845XQ_TConfig  oAccelConfig;

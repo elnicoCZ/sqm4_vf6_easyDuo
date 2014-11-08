@@ -27,7 +27,9 @@
  *
  ******************************************************************************/
 
-#include "easyDuo.h"
+#include "startup.h"
+#include "accelerometer.h"
+#include "gpio.h"
 
 #include "esl_appctrl.h"
 #include "esl_log.h"
@@ -41,24 +43,30 @@
 
 // Declare all your task IDs here:
 ESL_APPCTRL_TASKID_BEGIN()
-  ESL_APPCTRL_TASKID_ADD(tskAccel_ID)
+  ESL_APPCTRL_TASKID_ADD(STARTUP_TASKID)
+  ESL_APPCTRL_TASKID_ADD(ACCEL_TASKID)
+  ESL_APPCTRL_TASKID_ADD(GPIO_TASKID)
 ESL_APPCTRL_TASKID_END()
 
 //******************************************************************************
 
 // Declare all your message IDs here:
 ESL_APPCTRL_MSGID_BEGIN()
-  ESL_APPCTRL_MSGID_ADD(MSGID_tskAccel_ready)
+  ESL_APPCTRL_MSGID_ADD(MSGID_STARTUP_READY)
+  ESL_APPCTRL_MSGID_ADD(MSGID_ACCEL_READY)
+  ESL_APPCTRL_MSGID_ADD(MSGID_GPIO_READY)
 ESL_APPCTRL_MSGID_END()
 
 //******************************************************************************
 
 // Declare tasks to be handled manually here:
 ESL_APPCTRL_TEMPLATE_BEGIN()
-  ESL_APPCTRL_TEMPLATE_ADD_APPCTRL(                                                   20,                   MQX_AUTO_START_TASK )
-  ESL_APPCTRL_TEMPLATE_ADD_LOG(                                                       18 )
+  ESL_APPCTRL_TEMPLATE_ADD_APPCTRL(                                                   15,                   MQX_AUTO_START_TASK )
+  ESL_APPCTRL_TEMPLATE_ADD_LOG(                                                       13 )
   // ESL_APPCTRL_TEMPLATE_ADD_ESL(    Task ID,      function,             stack,    prio,     "string ID",     attributes.)
-  ESL_APPCTRL_TEMPLATE_ADD_ESL(   tskAccel_ID,      tskAccel,    tskAccel_STACK,      22,    tskAccel_STR,  ESL_APPCTRL_SENDMSGONREADY | ESL_APPCTRL_QUITAPPONFAILURE | MSGID_tskAccel_ready )
+  ESL_APPCTRL_TEMPLATE_ADD_ESL(STARTUP_TASKID,  startup_task, STARTUP_TASKSTACK,      17,STARTUP_TASKNAME,  ESL_APPCTRL_SENDMSGONREADY | ESL_APPCTRL_QUITAPPONFAILURE | MSGID_STARTUP_READY )
+//  ESL_APPCTRL_TEMPLATE_ADD_ESL(  ACCEL_TASKID,    accel_task,   ACCEL_TASKSTACK,      18,  ACCEL_TASKNAME,  ESL_APPCTRL_SENDMSGONREADY | ESL_APPCTRL_QUITAPPONFAILURE | MSGID_ACCEL_READY   )
+  ESL_APPCTRL_TEMPLATE_ADD_ESL(   GPIO_TASKID,     gpio_task,    GPIO_TASKSTACK,      19,   GPIO_TASKNAME,  ESL_APPCTRL_SENDMSGONREADY |                                MSGID_GPIO_READY    )
 ESL_APPCTRL_TEMPLATE_END()
 
 //******************************************************************************

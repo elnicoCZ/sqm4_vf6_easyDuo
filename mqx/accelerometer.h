@@ -39,8 +39,8 @@
 //******************************************************************************
 // Task information
 
-#define tskAccel_STACK        2000                                              //!< Task stack
-#define tskAccel_STR          "accelerometer"                                   //!< Task Name - should be unique
+#define ACCEL_TASKSTACK                 2000                                    //!< Task stack
+#define ACCEL_TASKNAME                  "accelerometer"                         //!< Task Name - should be unique
 
 // NOTE: Task start strategy and priority is application dependent and that's
 //       why it shouldn't be defined here, but in an application configuration!
@@ -49,7 +49,7 @@
 
 /** Accelerometer control task.
  * @param [in] initialData Task initial data. */
-void tskAccel (uint_32 initialData);
+void accel_task (uint_32 initialData);
 
 //******************************************************************************
 

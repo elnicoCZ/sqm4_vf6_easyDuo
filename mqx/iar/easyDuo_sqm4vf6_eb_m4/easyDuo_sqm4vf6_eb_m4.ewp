@@ -965,19 +965,31 @@
   <group>
     <name>Source</name>
     <file>
-      <name>$PROJ_DIR$\..\..\easyDuo.c</name>
+      <name>$PROJ_DIR$\..\..\accelerometer.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\easyDuo.h</name>
+      <name>$PROJ_DIR$\..\..\accelerometer.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\esl_config.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\gpio.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\gpio.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\i2cs.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\main.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\startup.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\startup.h</name>
     </file>
   </group>
 </project>

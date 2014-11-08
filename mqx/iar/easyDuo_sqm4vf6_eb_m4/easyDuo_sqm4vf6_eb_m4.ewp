@@ -173,6 +173,7 @@
         <option>
           <name>CCDefines</name>
           <state></state>
+          <state>_DEBUG=1</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -306,6 +307,7 @@
           <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug\bsp\Generated_Code</state>
           <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug\mfs</state>
           <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug\ffs</state>
+          <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug\mcc</state>
           <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug\rtcs</state>
           <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug</state>
           <state>$PROJ_DIR$\..\..</state>
@@ -364,7 +366,7 @@
         </option>
         <option>
           <name>IccLang</name>
-          <state>0</state>
+          <state>2</state>
         </option>
         <option>
           <name>IccCDialect</name>
@@ -376,7 +378,7 @@
         </option>
         <option>
           <name>IccCppDialect</name>
-          <state>1</state>
+          <state>2</state>
         </option>
         <option>
           <name>IccExceptions</name>
@@ -392,7 +394,7 @@
         </option>
         <option>
           <name>IccCppInlineSemantics</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IccCmsis</name>
@@ -566,6 +568,7 @@
           <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug\bsp</state>
           <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug\psp</state>
           <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug\bsp\Generated_Code</state>
+          <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug\mcc</state>
           <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug</state>
           <state>$PROJ_DIR$\..\..</state>
           <state>$PROJ_DIR$\..\..\libesl</state>
@@ -594,7 +597,7 @@
         <option>
           <name>OOCOutputFormat</name>
           <version>2</version>
-          <state>0</state>
+          <state>2</state>
         </option>
         <option>
           <name>OCOutputOverride</name>
@@ -602,7 +605,7 @@
         </option>
         <option>
           <name>OOCOutputFile</name>
-          <state>easyDuo_sqm4vf6_eb_m4.srec</state>
+          <state>easyDuo_sqm4vf6_eb_m4.bin</state>
         </option>
         <option>
           <name>OOCCommandLineProducer</name>
@@ -610,7 +613,7 @@
         </option>
         <option>
           <name>OOCObjCopyEnable</name>
-          <state>0</state>
+          <state>1</state>
         </option>
       </data>
     </settings>
@@ -779,7 +782,7 @@
         </option>
         <option>
           <name>IlinkOverrideProgramEntryLabel</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IlinkProgramEntryLabelSelect</name>
@@ -787,7 +790,7 @@
         </option>
         <option>
           <name>IlinkProgramEntryLabel</name>
-          <state>__iar_program_start</state>
+          <state>__boot</state>
         </option>
         <option>
           <name>DoFill</name>

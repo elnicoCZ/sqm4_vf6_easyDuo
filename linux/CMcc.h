@@ -30,7 +30,15 @@ enum {
   MCC_SEND_FAILURE,
   MCC_RECV_FAILURE,
   MCC_FREE_FAILURE,
+  MCC_INVALID_ARGUMENT,
 };
+
+//******************************************************************************
+typedef struct t_accel_data_struct {
+  int x;
+  int y;
+  int z;
+} TAccelData;
 
 //******************************************************************************
 
@@ -41,12 +49,15 @@ public:
   int setLedOn (void);
   int setLedOff (void);
   int setLedAuto (void);
+  int getAccelData (TAccelData * poData);
 
 protected:
   static MCC_ENDPOINT s_mccEndpointLocal;
   static MCC_ENDPOINT s_mccEndpointRemote;
 
   int sendMsg (TMccMsg & oMsg);
+  int recvMsg (TMccMsg ** ppoMsg);
+  int freeMsg (TMccMsg * poMsg);
 };
 
 //******************************************************************************

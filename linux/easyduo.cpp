@@ -9,12 +9,13 @@
 
 //******************************************************************************
 
-#define TIMER_DELAY                     1000
+#define TIMER_DELAY_ACCEL               (50)
+#define TIMER_DELAY_MEDIA               (1000)
 
 //******************************************************************************
 
 EasyDuo::EasyDuo(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent), m_poMcc(NULL)
 {
   QString sIp;
 
@@ -33,8 +34,10 @@ EasyDuo::EasyDuo(QWidget *parent)
   }
   m_pEasyPlayer = new EasyPlayer();
 
-  connect(&m_qTimer, SIGNAL(timeout()), this, SLOT(refresh()));
-  m_qTimer.start(TIMER_DELAY);
+  connect(&m_qTimerAccel, SIGNAL(timeout()), this, SLOT(refreshAccel()));
+  m_qTimerAccel.start(TIMER_DELAY_ACCEL);
+  connect(&m_qTimerMedia, SIGNAL(timeout()), this, SLOT(refreshMedia()));
+  m_qTimerMedia.start(TIMER_DELAY_MEDIA);
 }
 
 //******************************************************************************
@@ -65,7 +68,30 @@ void EasyDuo::play (void)
 
 //******************************************************************************
 
-void EasyDuo::refresh (void)
+void EasyDuo::refreshAccel (void)
+{
+  TAccelData  oAccelData;
+  int         ret;
+
+  if (m_poMcc) {
+    ret = m_poMcc->getAccelData(&oAccelData);
+    if (MCC_OK == ret) {
+      printf("getAccelData: %d %d %d\n", oAccelData.x, oAccelData.y, oAccelData.z);
+      ui.prgAccelX->setValue(oAccelData.x);
+      ui.prgAccelY->setValue(oAccelData.y);
+      ui.prgAccelZ->setValue(oAccelData.z);
+    } else {
+      // just to see that MCC communication is broken
+      ui.prgAccelX->setValue(-1);
+      ui.prgAccelY->setValue(0);
+      ui.prgAccelZ->setValue(1);
+    }
+  }
+}
+
+//******************************************************************************
+
+void EasyDuo::refreshMedia (void)
 {
   for (int i=0; i<ui.cbxMedia->count(); ++i) {
     const QList<QVariant> & qList = ui.cbxMedia->itemData(i).toList();

@@ -11,6 +11,13 @@
 #include <string.h>
 
 //******************************************************************************
+// Local definitions
+//******************************************************************************
+
+//#define MCC_WAIT_RECV                   (10*1000)                               //!< MCC Send timeout (in microseconds) - causes serious crashes! (?)
+#define MCC_WAIT_RECV                   (MCC_WAIT_INF)                          //!< MCC Send timeout (in microseconds)
+
+//******************************************************************************
 // Static initializers
 //******************************************************************************
 
@@ -72,6 +79,34 @@ int CMcc::sendMsg (TMccMsg & oMsg)
 
 //******************************************************************************
 
+int CMcc::recvMsg (TMccMsg ** ppoMsg)
+{
+  MCC_MEM_SIZE    size;
+  int             ret;
+
+  ret = mcc_recv_nocopy(&CMcc::s_mccEndpointLocal, (void**)ppoMsg, &size, MCC_WAIT_RECV);  // blocking call
+  if (MCC_SUCCESS != ret) {
+    printf("mcc_recv_nocopy failed: %d\n", ret);
+    return MCC_RECV_FAILURE;
+  }
+  return MCC_OK;
+}
+
+//******************************************************************************
+
+int CMcc::freeMsg (TMccMsg * poMsg)
+{
+  int ret;
+  ret = mcc_free_buffer(poMsg);
+  if (MCC_SUCCESS != ret) {
+    printf("mcc_free_buffer failed: %d\n", ret);
+    return MCC_FREE_FAILURE;
+  }
+  return MCC_OK;
+}
+
+//******************************************************************************
+
 int CMcc::setLedOn (void)
 {
   TMccMsg oMsg;
@@ -98,6 +133,31 @@ int CMcc::setLedAuto (void)
 
   oMsg.type = MCCMSG_LED_AUTO;
   return this->sendMsg(oMsg);
+}
+
+//******************************************************************************
+
+int CMcc::getAccelData (TAccelData * poData)
+{
+  TMccMsg     oMsg;
+  TMccMsg   * pMsg;
+  int         ret;
+
+  if (!poData) return MCC_INVALID_ARGUMENT;
+
+  oMsg.type = MCCMSG_ACCEL_DATA;
+  ret = this->sendMsg(oMsg);
+  if (MCC_OK != ret) return ret;
+
+  this->recvMsg(&pMsg);
+  if (MCC_OK != ret) return ret;
+
+  poData->x = pMsg->iDataX;
+  poData->y = pMsg->iDataY;
+  poData->z = pMsg->iDataZ;
+
+  this->freeMsg(pMsg);
+  return ret;
 }
 
 //******************************************************************************

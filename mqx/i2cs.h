@@ -26,7 +26,7 @@
 //******************************************************************************
 // I2C0 channel configuration
 #define I2C0_NO                             ESL_I2C0_NO
-#define I2C0_DRIVER_MODE                    ESL_I2C_DRIVERMODE_INT
+#define I2C0_DRIVER_MODE                    ESL_I2C_DRIVERMODE_POLLED
 #define I2C0_CHANNEL_MODE                   I2C_MODE_MASTER
 #define I2C0_BAUDRATE                       400000
 

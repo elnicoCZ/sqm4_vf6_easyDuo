@@ -12,6 +12,9 @@
 #define TIMER_DELAY_ACCEL               (50)
 #define TIMER_DELAY_MEDIA               (1000)
 
+#define PRG_ACCEL_SHIFT                 (8192)
+#define PRG_ACCEL_SCALE                 (1.0 / 4096.0)
+
 //******************************************************************************
 
 EasyDuo::EasyDuo(QWidget *parent)
@@ -35,9 +38,7 @@ EasyDuo::EasyDuo(QWidget *parent)
   m_pEasyPlayer = new EasyPlayer();
 
   connect(&m_qTimerAccel, SIGNAL(timeout()), this, SLOT(refreshAccel()));
-  m_qTimerAccel.start(TIMER_DELAY_ACCEL);
   connect(&m_qTimerMedia, SIGNAL(timeout()), this, SLOT(refreshMedia()));
-  m_qTimerMedia.start(TIMER_DELAY_MEDIA);
 }
 
 //******************************************************************************
@@ -47,6 +48,23 @@ EasyDuo::~EasyDuo()
   this->ledAuto();
   delete m_poMcc;
   delete m_pEasyPlayer;
+}
+
+//******************************************************************************
+
+bool EasyDuo::event(QEvent * ev)
+{
+  if(ev->type() == QEvent::WindowActivate) {
+    printf("OnActivate\n");
+    m_qTimerAccel.start(TIMER_DELAY_ACCEL);
+    m_qTimerMedia.start(TIMER_DELAY_MEDIA);
+  }
+  if(ev->type() == QEvent::WindowDeactivate) {
+    printf("OnDeactivate\n");
+    m_qTimerAccel.stop();
+    m_qTimerMedia.stop();
+  }
+  return QMainWindow::event(ev);
 }
 
 //******************************************************************************
@@ -76,15 +94,15 @@ void EasyDuo::refreshAccel (void)
   if (m_poMcc) {
     ret = m_poMcc->getAccelData(&oAccelData);
     if (MCC_OK == ret) {
-      printf("getAccelData: %d %d %d\n", oAccelData.x, oAccelData.y, oAccelData.z);
-      ui.prgAccelX->setValue(oAccelData.x);
-      ui.prgAccelY->setValue(oAccelData.y);
-      ui.prgAccelZ->setValue(oAccelData.z);
+//      printf("getAccelData: %d %d %d\n", oAccelData.x, oAccelData.y, oAccelData.z);
+      EasyDuo::prgAccelSetValue(*ui.prgAccelX, oAccelData.x);
+      EasyDuo::prgAccelSetValue(*ui.prgAccelY, oAccelData.y);
+      EasyDuo::prgAccelSetValue(*ui.prgAccelZ, oAccelData.z);
     } else {
       // just to see that MCC communication is broken
-      ui.prgAccelX->setValue(-1);
-      ui.prgAccelY->setValue(0);
-      ui.prgAccelZ->setValue(1);
+      EasyDuo::prgAccelSetValue(*ui.prgAccelX, -1);
+      EasyDuo::prgAccelSetValue(*ui.prgAccelY, 0);
+      EasyDuo::prgAccelSetValue(*ui.prgAccelZ, 1);
     }
   }
 }
@@ -100,6 +118,14 @@ void EasyDuo::refreshMedia (void)
       EasyDuo::cbxItemEnable(*ui.cbxMedia, i, bExists);
     }
   }
+}
+
+//******************************************************************************
+
+void EasyDuo::prgAccelSetValue(QProgressBar & qPrgBar, int val)
+{
+  qPrgBar.setValue(val + PRG_ACCEL_SHIFT);
+  qPrgBar.setFormat(QString("%1 g").arg(val * PRG_ACCEL_SCALE, 0, 'f', 3));
 }
 
 //******************************************************************************

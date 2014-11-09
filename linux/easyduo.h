@@ -22,8 +22,11 @@ private:
     QTimer              m_qTimerMedia;
     CMcc              * m_poMcc;
 
+    static void prgAccelSetValue(QProgressBar & qPrgBar, int val);
     static void cbxItemEnable(QComboBox & qCombo, int idx, bool bEnable);
     static bool fileExists(const char * sFilename);
+
+    bool event(QEvent * ev);
 
 private slots:
     void play ();

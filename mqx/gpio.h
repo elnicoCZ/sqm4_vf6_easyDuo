@@ -46,6 +46,15 @@
 //       why it shouldn't be defined here, but in an application configuration!
 
 //******************************************************************************
+// Return values
+//******************************************************************************
+
+enum {
+  GPIO_OK                         = MQX_OK,
+  GPIO_LWEVENT_CREATE_FAILURE,
+};
+
+//******************************************************************************
 
 /** GPIO (LED) control task.
  * @param [in] initialData Task initial data. */
@@ -56,6 +65,10 @@ void gpio_task (uint_32 u32InitialData);
  * @param [in] u8Event  Press/Release/Hold.
  * @param [in] u8KeyId  Key identifier. Specified in esl_keyboard_aoKeys[]. */
 void gpio_buttonEvent (uint_8 u8Event, uint_8 u8KeyId);
+
+void gpio_setLedOn    (void);
+void gpio_setLedOff   (void);
+void gpio_setLedAuto  (void);
 
 //******************************************************************************
 #endif // GPIO_H_093762096020765648966451020 //

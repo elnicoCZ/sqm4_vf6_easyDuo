@@ -5,6 +5,7 @@
 #include "ui_easyduo.h"
 
 #include "easyplayer.h"
+#include "CMcc.h"
 
 class EasyDuo : public QMainWindow
 {
@@ -18,6 +19,7 @@ private:
     Ui::EasyDuoClass    ui;
     EasyPlayer        * m_pEasyPlayer;
     QTimer              m_qTimer;
+    CMcc              * m_poMcc;
 
     static void cbxItemEnable(QComboBox & qCombo, int idx, bool bEnable);
     static bool fileExists(const char * sFilename);
@@ -26,6 +28,9 @@ private slots:
     void play();
     void refresh();
     void mute (bool bMute);
+    void ledOn ();
+    void ledOff ();
+    void ledAuto ();
 
 };
 

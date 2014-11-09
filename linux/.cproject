@@ -17,10 +17,12 @@
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope"/>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 		<buildTargets>
 			<target name="Qt Release Build" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
+				<buildArguments/>
 				<buildTarget>release</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
@@ -28,6 +30,7 @@
 			</target>
 			<target name="Qt Debug Build" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
+				<buildArguments/>
 				<buildTarget>debug</buildTarget>
 				<stopOnError>false</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
@@ -35,6 +38,7 @@
 			</target>
 		</buildTargets>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="org.eclipse.cdt.core.pathentry">
 		<pathentry base-path="/opt/vybrid/sdk-eb/twr_vf600/toolchain/include" include="" kind="inc" path="" system="true"/>
 		<pathentry base-path="/opt/vybrid/sdk-eb/twr_vf600/toolchain/include" include="orc-0.4" kind="inc" path="" system="true"/>
@@ -97,6 +101,7 @@
 		<pathentry base-path="/opt/vybrid/sdk-eb/twr_vf600/toolchain/include" include="asm" kind="inc" path="" system="true"/>
 		<pathentry base-path="/opt/vybrid/sdk-eb/twr_vf600/toolchain/include" include="gstreamer-0.10" kind="inc" path="" system="true"/>
 		<pathentry base-path="/opt/vybrid/sdk-eb/twr_vf600/toolchain/include" include="protocols" kind="inc" path="" system="true"/>
+		<pathentry kind="src" path="common"/>
+		<pathentry kind="out" path=""/>
 	</storageModule>
-	<storageModule moduleId="refreshScope"/>
 </cproject>

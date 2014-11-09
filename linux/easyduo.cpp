@@ -3,6 +3,7 @@
 #include "config.h"
 #include "network.h"
 #include "alsa.h"
+#include "../common/easyduo_mcc_common.h"
 
 #include <unistd.h>
 
@@ -25,6 +26,11 @@ EasyDuo::EasyDuo(QWidget *parent)
 
   config_loadMedia(*ui.cbxMedia, "easyduo.cfg");
 
+  try {
+    m_poMcc = new CMcc(MCC_ENDPOINT_A5_NODE, MCC_ENDPOINT_A5_PORT);
+  } catch (...) {
+    printf("mcc initialization failed");
+  }
   m_pEasyPlayer = new EasyPlayer();
 
   connect(&m_qTimer, SIGNAL(timeout()), this, SLOT(refresh()));
@@ -35,6 +41,8 @@ EasyDuo::EasyDuo(QWidget *parent)
 
 EasyDuo::~EasyDuo()
 {
+  this->ledAuto();
+  delete m_poMcc;
   delete m_pEasyPlayer;
 }
 
@@ -93,6 +101,27 @@ bool EasyDuo::fileExists(const char * sFilename)
 void EasyDuo::mute (bool bMute)
 {
   alsa_muteSpeaker(bMute);
+}
+
+//******************************************************************************
+
+void EasyDuo::ledOn ()
+{
+  if (m_poMcc) m_poMcc->setLedOn();
+}
+
+//******************************************************************************
+
+void EasyDuo::ledOff ()
+{
+  if (m_poMcc) m_poMcc->setLedOff();
+}
+
+//******************************************************************************
+
+void EasyDuo::ledAuto ()
+{
+  if (m_poMcc) m_poMcc->setLedAuto();
 }
 
 //******************************************************************************

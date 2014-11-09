@@ -752,12 +752,18 @@
           <property name="title">
            <string>LED Control</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_5" stretch="3,1">
+          <layout class="QVBoxLayout" name="verticalLayout_5" stretch="3,0">
            <property name="spacing">
             <number>-1</number>
            </property>
+           <property name="leftMargin">
+            <number>8</number>
+           </property>
            <property name="topMargin">
-            <number>5</number>
+            <number>3</number>
+           </property>
+           <property name="rightMargin">
+            <number>8</number>
            </property>
            <property name="bottomMargin">
             <number>5</number>
@@ -861,8 +867,13 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
              <property name="text">
-              <string>LED state</string>
+              <string>These buttons tell MQX how to drive the LED.</string>
              </property>
             </widget>
            </item>
@@ -972,9 +983,60 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>btnLedOn</sender>
+   <signal>pressed()</signal>
+   <receiver>EasyDuoClass</receiver>
+   <slot>ledOn()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>94</x>
+     <y>228</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>52</x>
+     <y>264</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLedOff</sender>
+   <signal>pressed()</signal>
+   <receiver>EasyDuoClass</receiver>
+   <slot>ledOff()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>147</x>
+     <y>223</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>108</x>
+     <y>266</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLedAuto</sender>
+   <signal>pressed()</signal>
+   <receiver>EasyDuoClass</receiver>
+   <slot>ledAuto()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>230</x>
+     <y>230</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>176</x>
+     <y>267</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>play()</slot>
   <slot>mute(bool)</slot>
+  <slot>ledOn()</slot>
+  <slot>ledOff()</slot>
+  <slot>ledAuto()</slot>
  </slots>
 </ui>

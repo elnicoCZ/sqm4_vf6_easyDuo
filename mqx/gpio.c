@@ -1,6 +1,6 @@
 /** ****************************************************************************
  *
- *  @file       gpio.h
+ *  @file       gpio.c
  *  @brief      GPIO control task.
  *
  *  Control task for EasyBoard GPIO.
@@ -152,8 +152,6 @@ void gpio_task (uint_32 u32InitialData)
           TD_REGISTER(TIMEDOMAIN_100MS);
         }
         uState = (uState & ~EVENT_Gpio_Mask_Speed) | EVENT_Gpio_LedFast;
-      } else {
-        LOGW_FORMATTED ("gpio_task unrecognized event");
       }
     }
   }

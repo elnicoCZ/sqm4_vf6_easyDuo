@@ -312,6 +312,7 @@
           <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug</state>
           <state>$PROJ_DIR$\..\..</state>
           <state>$PROJ_DIR$\..\..\libesl</state>
+          <state>$PROJ_DIR$\..\..\..\common</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -775,9 +776,7 @@
           <name>IlinkAdditionalLibs</name>
           <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug\bsp\bsp.a</state>
           <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug\psp\psp.a</state>
-          <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug\mfs\mfs.a</state>
-          <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug\ffs\ffs.a</state>
-          <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug\rtcs\rtcs.a</state>
+          <state>$_MQX_PATH_$\lib\sqm4vf6_eb_m4.iar\debug\mcc\mcc.a</state>
           <state>$PROJ_DIR$\..\..\libesl\libesld_sqm4vf6_eb_m4.a</state>
         </option>
         <option>
@@ -971,6 +970,9 @@
       <name>$PROJ_DIR$\..\..\accelerometer.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\common\easyduo_mcc_common.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\esl_config.h</name>
     </file>
     <file>
@@ -984,6 +986,12 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\main.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\mcc.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\mcc.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\startup.c</name>

@@ -97,8 +97,7 @@ void startup_task (uint32_t u32InitialData)
 
   // Initialize keyboard, which is based on time domain TIMEDOMAIN_10MS
   ret = esl_keyboard_init (TIMEDOMAIN_10MS, &err);
-  if (ret != ESL_KEYBOARD_OK)
-  {
+  if (ret != ESL_KEYBOARD_OK) {
     LOGE_FORMATTED ("esl_keyboard_init failed: %d, %d", ret, err);
   }
 

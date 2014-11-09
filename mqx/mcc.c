@@ -55,10 +55,10 @@ static uint_8 mcc_init (MCC_NODE iNode);
 //******************************************************************************
 // Globals
 //******************************************************************************
-static MCC_ENDPOINT g_mccEndpointLocal;                                         //!< Local AppMgr MCC endpoint.
+static MCC_ENDPOINT g_mccEndpointLocal;                                         //!< Local EasyDuo MCC endpoint.
 static MCC_ENDPOINT g_mccEndpointRemote = { MCC_ENDPOINT_A5_CORE,
                                             MCC_ENDPOINT_A5_NODE,
-                                            MCC_ENDPOINT_A5_PORT };             //!< Remote AppMgr MCC endpoint.
+                                            MCC_ENDPOINT_A5_PORT };             //!< Remote EasyDuo MCC endpoint.
 
 //******************************************************************************
 //******************************************************************************
@@ -121,6 +121,13 @@ void mcc_task (uint_32 u32InitialData)
       LOGW_FORMATTED("mcc_task unrecognized message: %d", poMsg->type);
       break;
     }
+
+    // Release the mcc buffer
+    ret = mcc_free_buffer(poMsg);
+    if (MCC_SUCCESS != ret) {
+      LOGW_FORMATTED("mcc_task mcc_free_buffer failed: %d", ret);
+      continue;
+    }
   }
 }
 
@@ -146,7 +153,7 @@ static uint_8 mcc_init (MCC_NODE iNode)
     LOGE_FORMATTED("MCC Library versions do not match ('%s' vs '%s')",
                    mccInfo.version_string, MCC_VERSION_STRING);
     mcc_destroy(iNode);
-    return MCC_INFO_FAILURE;
+    return MCC_VERSION_FAILURE;
   } else {
     LOGI_FORMATTED("MCC version %s loaded", mccInfo.version_string);
   }

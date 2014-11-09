@@ -53,6 +53,7 @@ enum {
   MCC_OK                          = MQX_OK,
   MCC_INIT_FAILURE,
   MCC_INFO_FAILURE,
+  MCC_VERSION_FAILURE,
   MCC_ENDPOINT_FAILURE,
 };
 

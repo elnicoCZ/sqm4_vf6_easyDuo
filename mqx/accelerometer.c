@@ -47,7 +47,7 @@
 
 #define ACCEL_PERIODIC_INTERVAL         (25)                                    //!< Readout period in milliseconds.
 #define ACCEL_INFINITE_INTERVAL         (0)                                     //!< Infinite wait period.
-#define ACCEL_MAX_MISSED_CNT            ((int)(10 * 25.0))                      //!< Number of missed readouts before switching to standby mode (10 seconds, 25 Hz, see the IC frequency configuration in accel_task()).
+#define ACCEL_MAX_MISSED_CNT            ((int)(10 * 40))                        //!< Number of missed readouts before switching to standby mode (10 seconds, 40 Hz, see ACCEL_PERIODIC_INTERVAL).
 #define ACCEL_LWSEM_WAIT                (10)                                    //!< Maximum number of milliseconds to wait for the semaphore.
 
 //******************************************************************************

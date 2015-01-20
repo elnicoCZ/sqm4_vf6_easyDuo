@@ -38,19 +38,55 @@
 
 //******************************************************************************
 // Task information
-
-#define ACCEL_TASKSTACK                 2000                                    //!< Task stack
-#define ACCEL_TASKNAME                  "accelerometer"                         //!< Task Name - should be unique
-
-// NOTE: Task start strategy and priority is application dependent and that's
-//       why it shouldn't be defined here, but in an application configuration!
-
 //******************************************************************************
 
-/** Accelerometer control task.
- * @param [in] initialData Task initial data. */
-void accel_task (uint_32 initialData);
+#define ACCEL_TASKSTACK       3000                                              //!< Task Stack
+#define ACCEL_TASKNAME        "accelerometer"                                   //!< Task Name - should be unique
+
+// NOTE: Task ID, start strategy and priority are application dependent and
+//       that's why they shouldn't be defined here, but in the application
+//       configuration in main.c!
 
 //******************************************************************************
+// Return values
+//******************************************************************************
 
-#endif /* ACCELEROMETER_H_385362083936620546820752037 */
+enum {
+  ACCEL_OK                        = MQX_OK,
+  ACCEL_LWEVENT_FAILURE,
+  ACCEL_LWSEM_FAILURE,
+  ACCEL_OUTDATED,
+  ACCEL_MODULE_OFF,
+};
+
+//******************************************************************************
+// Public types
+//******************************************************************************
+
+typedef struct t_accel_data_struct {
+  uint32_t  u32Timestamp;                                                       //!< Data timestamp (simple increasing integer).
+  int16_t   aiData[3];                                                          //!< Accelerometer 3-axis data.
+} TAccelData;
+
+//******************************************************************************
+// Task related public functions
+//******************************************************************************
+
+/** Accelerometer task.
+ * @param initialData Task initial data. */
+void accel_task (uint32_t u32InitialData);
+
+/** Retrieves the last measured accelerometer data, guarded by a semaphore.
+ * @param[out]  poDst         Destination memory to store the data to.
+ * @param[in]   u32WaitTicks  Semaphore wait timeout ticks. Use 0 for infinity.
+ * @return      ACCEL_OK on success.
+ *              ACCEL_LWSEM_FAILURE if waiting for semaphore fails.
+ *              ACCEL_OUTDATED if the read data is outdated because the module
+ *              switched to the standby mode. Call this function within
+ *              (ACCEL_MAX_MISSED_CNT * ACCEL_PERIODIC_INTERVAL) to retrieve
+ *              up-to-date data. Anyway, the data is copied. */
+uint_8 accel_getLastData (TAccelData  * poDst,
+                          uint_32       u32WaitTicks);
+
+//******************************************************************************
+#endif // ACCELEROMETER_H_385362083936620546820752037 //

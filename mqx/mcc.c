@@ -30,6 +30,7 @@
 #include "mcc.h"
 #include "easyduo_mcc_common.h"
 #include "gpio.h"
+#include "accelerometer.h"
 
 #include "esl_appctrl.h"
 
@@ -55,10 +56,10 @@ static uint_8 mcc_init (MCC_NODE iNode);
 //******************************************************************************
 // Globals
 //******************************************************************************
-static MCC_ENDPOINT g_mccEndpointLocal;                                         //!< Local AppMgr MCC endpoint.
+static MCC_ENDPOINT g_mccEndpointLocal;                                         //!< Local EasyDuo MCC endpoint.
 static MCC_ENDPOINT g_mccEndpointRemote = { MCC_ENDPOINT_A5_CORE,
                                             MCC_ENDPOINT_A5_NODE,
-                                            MCC_ENDPOINT_A5_PORT };             //!< Remote AppMgr MCC endpoint.
+                                            MCC_ENDPOINT_A5_PORT };             //!< Remote EasyDuo MCC endpoint.
 
 //******************************************************************************
 //******************************************************************************
@@ -67,7 +68,9 @@ static MCC_ENDPOINT g_mccEndpointRemote = { MCC_ENDPOINT_A5_CORE,
 void mcc_task (uint_32 u32InitialData)
 {
   TMccMsg       * poMsg;
+  TMccMsg         oMsg;
   MCC_MEM_SIZE    size;
+  TAccelData      oAccelData;
   int             ret;
 
   ret = mcc_init (MCC_ENDPOINT_M4_NODE);
@@ -88,7 +91,7 @@ void mcc_task (uint_32 u32InitialData)
   // Infinite message loop -----------------------------------------------------
   while (1) {
     // Wait for a message
-    ret = mcc_recv_nocopy(&g_mccEndpointLocal, (void**)&poMsg, &size, MCC_WAIT_INF);
+    ret = mcc_recv_nocopy(&g_mccEndpointLocal, (void**)&poMsg, &size, MCC_WAIT_INF);  // blocking call
     if (MCC_SUCCESS != ret) {
       LOGE_FORMATTED("mcc_task mcc_recv_nocopy failed: %d", ret);
       continue;
@@ -114,12 +117,31 @@ void mcc_task (uint_32 u32InitialData)
       break;
 
     case MCCMSG_ACCEL_DATA:
-      LOGI_STR("mcc_task ACCEL_DATA message received");
+      ret = accel_getLastData (&oAccelData, MSECS_TO_MQX_TICKS(1));
+      if (ACCEL_OK != ret) {
+        LOGW_FORMATTED("mcc_task accel_getLastData failed: %d", ret);
+        oMsg.iDataX = oMsg.iDataY = oMsg.iDataZ = 0;
+      } else {
+        oMsg.iDataX = oAccelData.aiData[0];
+        oMsg.iDataY = oAccelData.aiData[1];
+        oMsg.iDataZ = oAccelData.aiData[2];
+      }
+      ret = mcc_send(&g_mccEndpointRemote, &oMsg, sizeof(oMsg), 0);             // non-blocking call
+      if (MCC_OK != ret) {
+        LOGE_FORMATTED("mcc_task mcc_send failed: %d", ret);
+      }
       break;
 
     default:
       LOGW_FORMATTED("mcc_task unrecognized message: %d", poMsg->type);
       break;
+    }
+
+    // Release the mcc buffer
+    ret = mcc_free_buffer(poMsg);
+    if (MCC_SUCCESS != ret) {
+      LOGW_FORMATTED("mcc_task mcc_free_buffer failed: %d", ret);
+      continue;
     }
   }
 }
@@ -146,7 +168,7 @@ static uint_8 mcc_init (MCC_NODE iNode)
     LOGE_FORMATTED("MCC Library versions do not match ('%s' vs '%s')",
                    mccInfo.version_string, MCC_VERSION_STRING);
     mcc_destroy(iNode);
-    return MCC_INFO_FAILURE;
+    return MCC_VERSION_FAILURE;
   } else {
     LOGI_FORMATTED("MCC version %s loaded", mccInfo.version_string);
   }

@@ -31,34 +31,105 @@
 #include "i2cs.h"
 
 #include "esl_appctrl.h"
+#include "esl_i2c.h"
 #include "esl_i2c_MMA845xQ.h"
+#include "esl_log.h"
+#include "esl_rtc.h"
+#include "esl_utils.h"
 
 #include <mqx.h>
 #include <bsp.h>
+#include <lwevent.h>
+
+//******************************************************************************
+// General Definitions
+//******************************************************************************
+
+#define ACCEL_PERIODIC_INTERVAL         (25)                                    //!< Readout period in milliseconds.
+#define ACCEL_INFINITE_INTERVAL         (0)                                     //!< Infinite wait period.
+#define ACCEL_MAX_MISSED_CNT            ((int)(10 * 40))                        //!< Number of missed readouts before switching to standby mode (10 seconds, 40 Hz, see ACCEL_PERIODIC_INTERVAL).
+#define ACCEL_LWSEM_WAIT                (10)                                    //!< Maximum number of milliseconds to wait for the semaphore.
+
+//******************************************************************************
+// Lwevent communication interface
+//******************************************************************************
+
+#define EVENT_Accel_Wakeup                  (1 << 0)                            //!< Event to wakeup from standby.
+#define EVENT_Accel_Mask                    (EVENT_Accel_Wakeup)                //!< Mask of all events.
+
+//******************************************************************************
+// Globals
+//******************************************************************************
+
+static LWEVENT_STRUCT g_lwevent;                                                //!< Controls the periodic readouts.
+static LWSEM_STRUCT   g_lwsem;                                                  //!< Guards exclusive access to g_oAccelData and g_u32MissedCnt.
+static TAccelData     g_oAccelData;                                             //!< Accelerometer data.
+static uint32_t       g_u32MissedCnt;                                           //!< Missed readouts count.
+
+//******************************************************************************
+// Functions declarations
+//******************************************************************************
+
+/** Saves the last measured accelerometer data, guarded by a semaphore.
+ * @param[in]   poSrc         Source data to store to the global variable.
+ * @param[in]   u32WaitTicks  Semaphore wait timeout ticks. Use 0 for infinity.
+ * @return      ACCEL_OK on success.
+ *              ACCEL_LWSEM_FAILURE if waiting for semaphore fails.
+ *              ACCEL_OUTDATED if too many readouts have been missed by
+ *              consumer(s) (see ACCEL_MAX_MISSED_CNT). The module should switch
+ *              to the standby mode. */
+static uint_8 accel_setLastData (const TAccelData   * poSrc,
+                                 uint_32              u32WaitTicks);
 
 //******************************************************************************
 //******************************************************************************
 //******************************************************************************
 
-void accel_task (uint_32 initialData)
+void accel_task (uint32_t u32InitialData)
 {
   ESL_I2C_MMA845XQ_TDevice  hAccelDevice;
   ESL_I2C_MMA845XQ_TConfig  oAccelConfig;
   int_16                    ai16Data[3];
-  float                     afData[3];
-  uint_8                    u8DeviceId;
-  uint_8                    ret;
+  TAccelData                oAccelData;
+  _mqx_uint                 uEventWaitTicks;
+  uint_32                   ret;
 
+  // Lwevent initialization ----------------------------------------------------
+  ret = _lwevent_create(&g_lwevent, LWEVENT_AUTO_CLEAR);
+  if (MQX_OK != ret) {
+    LOGE_FORMATTED ("_lwevent_create failed: %d", ret);
+    ESL_APPCTRL_INITDONE(u32InitialData, ACCEL_LWEVENT_FAILURE);
+  }
+
+  // Lwsem initialization ------------------------------------------------------
+  ret = _lwsem_create(&g_lwsem, 1);
+  if (MQX_OK != ret) {
+    LOGE_FORMATTED ("_lwsem_create failed: %d", ret);
+    ESL_APPCTRL_INITDONE(u32InitialData, ACCEL_LWSEM_FAILURE);
+  }
+
+  // Data storage initialization -----------------------------------------------
+  oAccelData.aiData[0]    = 0;
+  oAccelData.aiData[1]    = 0;
+  oAccelData.aiData[2]    = 0;
+  oAccelData.u32Timestamp = 0;
+  ret = accel_setLastData (&oAccelData, 0);
+  if (ACCEL_OK != ret) {
+    LOGE_FORMATTED("accel_setLastData failed: %d", ret);
+    ESL_APPCTRL_INITDONE(u32InitialData, ret);
+  }
+
+  // Accelerometer initialization ----------------------------------------------
   // get default accelerometer configuration
   ret = esl_i2c_MMA845xQ_getDefaultConfig (&oAccelConfig);
   if (ESL_I2C_OK != ret) {
     LOGE_FORMATTED("esl_i2c_MMA845xQ_getDefaultConfig failed: %d", ret);
-    ESL_APPCTRL_INITDONE(initialData, ret);
+    ESL_APPCTRL_INITDONE(u32InitialData, ret);
   }
 
-  // change the configuration: set Output Data Rate to 6.25 Hz
+  // change the configuration: set Output Data Rate to 50 Hz
   oAccelConfig.u8CtrlReg1 &= ~ESL_I2C_MMA845XQ_CTRL_REG1_DR_MASK;
-  oAccelConfig.u8CtrlReg1 |=  ESL_I2C_MMA845XQ_CTRL_REG1_DR_VAL_6_25;
+  oAccelConfig.u8CtrlReg1 |=  ESL_I2C_MMA845XQ_CTRL_REG1_DR_VAL_50;
   // change the configuration: reduce Noise (limits Dynamic Range to 4g!)
   oAccelConfig.u8CtrlReg1 |=  ESL_I2C_MMA845XQ_CTRL_REG1_LNOISE_MASK;
   // change the configuration: set High Resolution mode (high oversampling -> low noise)
@@ -74,69 +145,116 @@ void accel_task (uint_32 initialData)
                                &oAccelConfig);
   if (ESL_I2C_OK != ret) {
     LOGE_FORMATTED("esl_i2c_MMA845xQ_open failed: %d", ret);
-    ESL_APPCTRL_INITDONE(initialData, ret);
+    ESL_APPCTRL_INITDONE(u32InitialData, ret);
   }
 
   // activate the device
   ret = esl_i2c_MMA845xQ_activate (&hAccelDevice);
   if (ESL_I2C_OK != ret) {
     LOGE_FORMATTED("esl_i2c_MMA845xQ_activate failed: %d", ret);
-    ESL_APPCTRL_INITDONE(initialData, ret);
+    ESL_APPCTRL_INITDONE(u32InitialData, ret);
   }
 
-  ESL_APPCTRL_INITDONE(initialData, MQX_OK);
-  // ------------------ END OF INIT ------------------ //
+  ESL_APPCTRL_INITDONE(u32InitialData, MQX_OK);
 
-  // print device type
-  ret = esl_i2c_MMA845xQ_getDeviceId (&u8DeviceId, &hAccelDevice);
-  if (ESL_I2C_OK != ret) {
-    LOGW_FORMATTED("esl_i2c_MMA845xQ_getDeviceId failed: %d", ret);
-  } else {
-    switch (u8DeviceId) {
-    case ESL_I2C_MMA8451Q_DEVICE_ID: LOGI_STR("Detected type: MMA8451Q"); break;
-    case ESL_I2C_MMA8452Q_DEVICE_ID: LOGI_STR("Detected type: MMA8452Q"); break;
-    case ESL_I2C_MMA8453Q_DEVICE_ID: LOGI_STR("Detected type: MMA8453Q"); break;
-    default:
-      LOGW_FORMATTED("Unrecognized type: %d", u8DeviceId);
-      break;
-    }
-  }
-
+  // Infinite loop -------------------------------------------------------------
+  uEventWaitTicks = MSECS_TO_MQX_TICKS(ACCEL_PERIODIC_INTERVAL);
   while (1) {
-    // We must poll here, as R59 is not placed on EasyBoard by default,
-    // disallowing to use the interrupt from the accelerometer's INT1 signal.
-    // The delay is set so that every second call to getRawData should fail.
-    _time_delay(80);
-    ret = esl_i2c_MMA845xQ_getRawData (ai16Data, &hAccelDevice);
-    if (ESL_I2C_MMA845XQ_DATA_NOT_READY == ret) {
-      //LOGI_STR("esl_i2c_MMA845xQ_getRawData: NO DATA");
+    // Wait for an event
+    ret = _lwevent_wait_ticks(&g_lwevent,
+                              EVENT_Accel_Wakeup,
+                              FALSE,
+                              uEventWaitTicks);
+    if (MQX_OK == ret) {                                                        // WAKEUP event received
+      uEventWaitTicks = MSECS_TO_MQX_TICKS(ACCEL_PERIODIC_INTERVAL);
+      LOGI_FORMATTED("Accel: Switching to READY");
+    } else if (LWEVENT_WAIT_TIMEOUT != ret) {                                   // error occured
+      LOGW_FORMATTED("_lwevent_wait_ticks failed: %d", ret);
       continue;
-    } else if (ESL_I2C_OK != ret) {
+    }
+
+    // wait timeout occured or WAKEUP event received -> get new data
+
+    ret = esl_i2c_MMA845xQ_getRawData (ai16Data, &hAccelDevice);
+    if (ESL_I2C_OK == ret) {
+      ret = esl_i2c_MMA845xQ_raw2int (oAccelData.aiData, ai16Data, &hAccelDevice);
+      if (ESL_I2C_OK == ret) {
+        ++oAccelData.u32Timestamp;
+        ret = accel_setLastData (&oAccelData,
+                                 MSECS_TO_MQX_TICKS(ACCEL_LWSEM_WAIT));
+        if (ACCEL_OUTDATED == ret) {
+          uEventWaitTicks = ACCEL_INFINITE_INTERVAL;
+          LOGI_FORMATTED("Accel: Switching to STANDBY");
+        } else if (ACCEL_OK != ret) {
+          LOGW_FORMATTED("accel_setLastData failed: %d", ret);
+        }
+      } else {
+        LOGW_FORMATTED("esl_i2c_MMA845xQ_raw2int failed: %d", ret);
+      }
+
+    } else if (ESL_I2C_MMA845XQ_DATA_NOT_READY != ret) {
       LOGW_FORMATTED("esl_i2c_MMA845xQ_getRawData failed: %d", ret);
-    } else {
-      LOGI_FORMATTED("RAW: % 5d, % 5d, % 5d",
-                     ai16Data[0], ai16Data[1], ai16Data[2]);
-      ret = esl_i2c_MMA845xQ_raw2g (afData, ai16Data, &hAccelDevice);
-    }
-    if (ESL_I2C_OK != ret) {
-      LOGW_FORMATTED("esl_i2c_MMA845xQ_raw2g failed: %d", ret);
-    } else {
-      ret = esl_i2c_MMA845xQ_raw2int (ai16Data, ai16Data, &hAccelDevice);
-    }
-    if (ESL_I2C_OK != ret) {
-      LOGW_FORMATTED("esl_i2c_MMA845xQ_raw2int failed: %d", ret);
-    } else {
-      LOGI_FORMATTED("x=% .4f, y=% .4f, z=% .4f (% 5d, % 5d, % 5d)",
-                     afData[0], afData[1], afData[2],
-                     ai16Data[0], ai16Data[1], ai16Data[2]);
     }
   }
-
-#pragma diag_suppress=Pe111                                                     // Warning[Pe111]: statement is unreachable
-  // this code should be never reached, but this is how the device can be closed
-  ret = esl_i2c_MMA845xQ_close (&hAccelDevice);
-  if (ESL_I2C_OK != ret) LOGW_FORMATTED("esl_i2c_MMA845xQ_close failed: %d", ret);
-#pragma diag_default=Pe111
 }
 
 //******************************************************************************
+
+uint_8 accel_getLastData (TAccelData  * poDst,
+                          uint_32       u32WaitTicks)
+{
+  int ret;
+  assert(poDst);
+
+  // Retrieve the semaphore
+  ret = _lwsem_wait_ticks(&g_lwsem, u32WaitTicks);
+  if (ret != MQX_OK) return ACCEL_LWSEM_FAILURE;
+
+  // CRITICIAL SECTION START //
+
+  *poDst = g_oAccelData;
+  if (g_u32MissedCnt >= ACCEL_MAX_MISSED_CNT) {
+    ret = ACCEL_OUTDATED;
+    _lwevent_set(&g_lwevent, EVENT_Accel_Wakeup);
+  } else {
+    ret = ACCEL_OK;
+  }
+  g_u32MissedCnt = 0;
+
+  _lwsem_post(&g_lwsem);
+
+  // CRITICIAL SECTION END //
+
+  return ret;
+}
+
+//******************************************************************************
+// Private functions
+//******************************************************************************
+
+static uint_8 accel_setLastData (const TAccelData   * poSrc,
+                                 uint_32              u32WaitTicks)
+{
+  int ret;
+  assert(poSrc);
+
+  // Retrieve the semaphore
+  ret = _lwsem_wait_ticks(&g_lwsem, u32WaitTicks);
+  if (ret != MQX_OK) return ACCEL_LWSEM_FAILURE;
+
+  // CRITICIAL SECTION START //
+
+  g_oAccelData = *poSrc;
+  if (g_u32MissedCnt >= ACCEL_MAX_MISSED_CNT) {
+    ret = ACCEL_OUTDATED;
+  } else {
+    ++g_u32MissedCnt;
+    ret = ACCEL_OK;
+  }
+
+  _lwsem_post(&g_lwsem);
+
+  // CRITICIAL SECTION END //
+
+  return ret;
+}

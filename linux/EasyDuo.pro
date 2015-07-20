@@ -1,7 +1,8 @@
 TEMPLATE = app
-TARGET = EasyDuo
+TARGET = easyduo
 QT += core \
-    gui
+    gui \
+    network
 HEADERS += CMcc.h \
     ../common/easyduo_mcc_common.h \
     alsa.h \
@@ -22,3 +23,6 @@ RESOURCES += pictures.qrc
 LIBS += -lconfig++ \
     -lasound \
     -lmcc
+# make install
+target.path = /usr/bin
+INSTALLS += target

@@ -1,0 +1,84 @@
+#!/bin/sh
+# EasyDuo demo init script
+# (to be located in /etc/init.d and started by an rc script)
+
+#################################################################################
+# index of given gpio at RGPIO table
+PTA30=20
+PTD24=70
+
+# USB enable pins addresses
+USB0_EN=$PTD24
+USB1_EN=$PTA30
+
+# paths
+path=/sys/class/gpio
+path0=$path/gpio$USB0_EN
+path1=$path/gpio$USB1_EN
+root=/home/root
+usb0_link=$root/usb0_en
+usb1_link=$root/usb1_en
+firmware=$root/easyDuo_sqm4vf6_eb_m4.bin
+
+usb_export() {
+        # init USB0 and power it off
+        echo $USB0_EN > $path/export
+        echo out > $path0/direction
+        ln -sf $path0/value $usb0_link
+        echo 0 > $usb0_link
+
+        # init USB1 and power it on
+        echo $USB1_EN > $path/export
+        echo out > $path1/direction
+        ln -sf $path1/value $usb1_link
+        echo 1 > $usb1_link
+}
+
+usb_unexport() {
+        rm $usb0_link
+        rm $usb1_link
+        echo $USB0_EN > $path/unexport
+        echo $USB1_EN > $path/unexport
+}
+
+amixer_configure() {
+        # PCM - 75%
+        amixer sset 'PCM' 117
+        # Mic - 50% (30 dB)
+        amixer sset 'Mic' 2
+        # Capture Attenuation - 0%
+        amixer sset 'Capture Attenuate Switch (-6dB)' 0
+}
+
+case "$1" in
+  start)
+        echo "Starting easyduo"
+        # export USB GPIO's
+        usb_export
+        # wait for the changes to take effect (0.1s)
+        usleep 100000
+        # load the MCC kernel module
+        /sbin/modprobe mcc
+        # configure audio codec
+        amixer_configure
+        # wait a while (1s) for the changes to take effect
+        sleep 1
+        # boot firmware on M4
+        mqxboot $firmware 0x3f000000 0x3f000401
+        # run easyduo
+        easyduo -qws &
+        echo "done."
+        ;;
+
+  stop)
+        echo "Stopping appmgr"
+        usb_unexport
+        echo "done."
+        ;;
+
+  *)
+        echo "Usage: $0 {start|stop}"
+        exit 1
+esac
+
+exit 0

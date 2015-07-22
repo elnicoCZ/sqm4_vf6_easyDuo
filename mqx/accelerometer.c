@@ -63,6 +63,7 @@
 
 static LWEVENT_STRUCT g_lwevent;                                                //!< Controls the periodic readouts.
 static LWSEM_STRUCT   g_lwsem;                                                  //!< Guards exclusive access to g_oAccelData and g_u32MissedCnt.
+static int32_t        g_i32DeviceId;                                            //!< Accelerometer device ID.
 static TAccelData     g_oAccelData;                                             //!< Accelerometer data.
 static uint32_t       g_u32MissedCnt;                                           //!< Missed readouts count.
 
@@ -109,9 +110,9 @@ void accel_task (uint32_t u32InitialData)
   }
 
   // Data storage initialization -----------------------------------------------
-  oAccelData.aiData[0]    = 0;
-  oAccelData.aiData[1]    = 0;
-  oAccelData.aiData[2]    = 0;
+  oAccelData.afData[0]    = 0.0f;
+  oAccelData.afData[1]    = 0.0f;
+  oAccelData.afData[2]    = 0.0f;
   oAccelData.u32Timestamp = 0;
   ret = accel_setLastData (&oAccelData, 0);
   if (ACCEL_OK != ret) {
@@ -138,14 +139,27 @@ void accel_task (uint32_t u32InitialData)
 
   // open the device (and apply the configuration)
   ret = esl_i2c_MMA845xQ_open (&hAccelDevice,
-                               ACCEL_MMA8451Q_CHANNEL_NO,
-                               ACCEL_MMA8451Q_DRIVER_MODE,
-                               ACCEL_MMA8451Q_CHANNEL_BAUDRATE,
-                               ACCEL_MMA8451Q_SA0,
+                               ACCEL_MMA845xQ_CHANNEL_NO,
+                               ACCEL_MMA845xQ_DRIVER_MODE,
+                               ACCEL_MMA845xQ_CHANNEL_BAUDRATE,
+                               ACCEL_MMA845xQ_SA0,
                                &oAccelConfig);
   if (ESL_I2C_OK != ret) {
     LOGE_FORMATTED("esl_i2c_MMA845xQ_open failed: %d", ret);
     ESL_APPCTRL_INITDONE(u32InitialData, ret);
+  }
+
+  // store device id
+  ret = esl_i2c_MMA845xQ_getDeviceId ((uint8_t*)&g_i32DeviceId, &hAccelDevice);
+  if (ESL_I2C_OK == ret) {
+    switch ((uint8_t)g_i32DeviceId) {
+    case ESL_I2C_MMA8451Q_DEVICE_ID:    g_i32DeviceId = ACCEL_TYPE_MMA8451Q; break;
+    case ESL_I2C_MMA8452Q_DEVICE_ID:    g_i32DeviceId = ACCEL_TYPE_MMA8452Q; break;
+    case ESL_I2C_MMA8453Q_DEVICE_ID:    g_i32DeviceId = ACCEL_TYPE_MMA8453Q; break;
+    default:                            g_i32DeviceId = ACCEL_TYPE_UNKNOWN;  break;
+    }
+  } else {
+    g_i32DeviceId = ACCEL_TYPE_UNKNOWN;
   }
 
   // activate the device
@@ -177,7 +191,7 @@ void accel_task (uint32_t u32InitialData)
 
     ret = esl_i2c_MMA845xQ_getRawData (ai16Data, &hAccelDevice);
     if (ESL_I2C_OK == ret) {
-      ret = esl_i2c_MMA845xQ_raw2int (oAccelData.aiData, ai16Data, &hAccelDevice);
+      ret = esl_i2c_MMA845xQ_raw2g (oAccelData.afData, ai16Data, &hAccelDevice);
       if (ESL_I2C_OK == ret) {
         ++oAccelData.u32Timestamp;
         ret = accel_setLastData (&oAccelData,
@@ -196,6 +210,13 @@ void accel_task (uint32_t u32InitialData)
       LOGW_FORMATTED("esl_i2c_MMA845xQ_getRawData failed: %d", ret);
     }
   }
+}
+
+//******************************************************************************
+
+int32_t accel_getIdentifier (void)
+{
+  return g_i32DeviceId;
 }
 
 //******************************************************************************

@@ -6,6 +6,10 @@
  *  @copyright  Elnico Ltd. All rights reserved.
  *  @author     Petr Kubiznak <kubiznak.petr@elnico.cz>
  *
+ *  @version    1.1 2015-07-22: Petr Kubiznak <kubiznak.petr@elnico.cz>
+ *                              ACCEL_DATA message redefined to send floats.
+ *                              ACCEL_INFO message introduced.
+ *
  *  @version    1.0 2014-11-08: Petr Kubiznak <kubiznak.petr@elnico.cz>
  *                              Initial version.
  *
@@ -81,10 +85,15 @@
 /** Multi-core communication message structure. */
 typedef struct mcc_msg_struct {
   int32_t           type;                                                       //!< Message type.
-  struct {
-    int32_t         iDataX;                                                     //!< X-axis accelerometer data.
-    int32_t         iDataY;                                                     //!< Y-axis accelerometer data.
-    int32_t         iDataZ;                                                     //!< Z-axis accelerometer data.
+  union {
+    struct {
+      float         fDataX;                                                     //!< X-axis accelerometer data in g-force.
+      float         fDataY;                                                     //!< Y-axis accelerometer data in g-force.
+      float         fDataZ;                                                     //!< Z-axis accelerometer data in g-force.
+    };
+    struct {
+      int32_t       iAccelType;                                                 //!< Accelerometer type ID.
+    };
   };
 } TMccMsg;
 
@@ -98,6 +107,7 @@ enum {
   MCCMSG_LED_ON,                                                                //!< Set LED ON.
   MCCMSG_LED_OFF,                                                               //!< Set LED OFF.
   MCCMSG_LED_AUTO,                                                              //!< Drive LED automatically by M4.
+  MCCMSG_ACCEL_INFO,                                                            //!< Request/send accelerometer identification.
   MCCMSG_ACCEL_DATA,                                                            //!< Request/send accelerometer data.
 };
 
@@ -105,7 +115,12 @@ enum {
 // Other definitions
 //******************************************************************************
 
-#define MCC_WAIT_INF                (0xFFFFFFFF)                                //!< Wait delay constant for infinite wait.
+#define MCC_WAIT_INF                    (0xFFFFFFFF)                            //!< Wait delay constant for infinite wait.
+
+#define ACCEL_TYPE_UNKNOWN              (0)                                     //!< Unknown accelerometer type.
+#define ACCEL_TYPE_MMA8451Q             (1)                                     //!< Accelerometer MMA8451Q.
+#define ACCEL_TYPE_MMA8452Q             (2)                                     //!< Accelerometer MMA8452Q.
+#define ACCEL_TYPE_MMA8453Q             (3)                                     //!< Accelerometer MMA8453Q.
 
 //******************************************************************************
 #endif // EASYDUO_MCC_COMMON_H_957416452703645164651780502134 //

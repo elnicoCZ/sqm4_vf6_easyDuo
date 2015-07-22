@@ -116,15 +116,25 @@ void mcc_task (uint_32 u32InitialData)
       gpio_setLedAuto();
       break;
 
+    case MCCMSG_ACCEL_INFO:
+      oMsg.type = MCCMSG_ACCEL_INFO;
+      oMsg.iAccelType = accel_getIdentifier();
+      ret = mcc_send(&g_mccEndpointRemote, &oMsg, sizeof(oMsg), 0);             // non-blocking call
+      if (MCC_OK != ret) {
+        LOGE_FORMATTED("mcc_task mcc_send failed: %d", ret);
+      }
+      break;
+
     case MCCMSG_ACCEL_DATA:
+      oMsg.type = MCCMSG_ACCEL_DATA;
       ret = accel_getLastData (&oAccelData, MSECS_TO_MQX_TICKS(1));
       if (ACCEL_OK != ret) {
         LOGW_FORMATTED("mcc_task accel_getLastData failed: %d", ret);
-        oMsg.iDataX = oMsg.iDataY = oMsg.iDataZ = 0;
+        oMsg.fDataX = oMsg.fDataY = oMsg.fDataZ = 0.0f;
       } else {
-        oMsg.iDataX = oAccelData.aiData[0];
-        oMsg.iDataY = oAccelData.aiData[1];
-        oMsg.iDataZ = oAccelData.aiData[2];
+        oMsg.fDataX = oAccelData.afData[0];
+        oMsg.fDataY = oAccelData.afData[1];
+        oMsg.fDataZ = oAccelData.afData[2];
       }
       ret = mcc_send(&g_mccEndpointRemote, &oMsg, sizeof(oMsg), 0);             // non-blocking call
       if (MCC_OK != ret) {

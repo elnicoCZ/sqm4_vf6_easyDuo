@@ -42,12 +42,25 @@ usb_unexport() {
 }
 
 amixer_configure() {
-        # PCM - 75%
-        amixer sset 'PCM' 117
+        # PCM - 100%
+        amixer sset 'PCM' 156
         # Mic - 50% (30 dB)
         amixer sset 'Mic' 2
         # Capture Attenuation - 0%
         amixer sset 'Capture Attenuate Switch (-6dB)' 0
+}
+
+ts_calibrate() {
+	if [ -f /etc/profile.d/tslib.sh ]; then
+		. /etc/profile.d/tslib.sh
+	fi
+	if [ -e "$TSLIB_TSDEVICE" ]; then
+		QWS_MOUSE_PROTO=tslib:$TSLIB_TSDEVICE
+	fi
+
+	if [ ! -f /etc/pointercal ]; then
+		/usr/bin/ts_calibrate
+	fi
 }
 
 case "$1" in
@@ -61,6 +74,8 @@ case "$1" in
         /sbin/modprobe mcc
         # configure audio codec
         amixer_configure
+	# calibrate touchscreen
+	ts_calibrate
         # wait a while (1s) for the changes to take effect
         sleep 1
         # boot firmware on M4

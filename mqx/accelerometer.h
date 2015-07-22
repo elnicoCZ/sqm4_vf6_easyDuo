@@ -36,6 +36,8 @@
 # include "psptypes_legacy.h"
 #endif
 
+#include "easyduo_mcc_common.h"
+
 //******************************************************************************
 // Task information
 //******************************************************************************
@@ -65,7 +67,7 @@ enum {
 
 typedef struct t_accel_data_struct {
   uint32_t  u32Timestamp;                                                       //!< Data timestamp (simple increasing integer).
-  int16_t   aiData[3];                                                          //!< Accelerometer 3-axis data.
+  float     afData[3];                                                          //!< Accelerometer 3-axis data.
 } TAccelData;
 
 //******************************************************************************
@@ -75,6 +77,11 @@ typedef struct t_accel_data_struct {
 /** Accelerometer task.
  * @param initialData Task initial data. */
 void accel_task (uint32_t u32InitialData);
+
+/** Retrieves accelerometer identifier, as defined in easyduo_mcc_common.h.
+ * @return      ACCEL_TYPE_MMA8451Q, ACCEL_TYPE_MMA8452Q, ACCEL_TYPE_MMA8453Q.
+                ACCEL_TYPE_UNKNOWN if not known. */
+int32_t accel_getIdentifier (void);
 
 /** Retrieves the last measured accelerometer data, guarded by a semaphore.
  * @param[out]  poDst         Destination memory to store the data to.

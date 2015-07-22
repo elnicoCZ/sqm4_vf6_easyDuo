@@ -27,6 +27,7 @@ private:
     static bool fileExists(const char * sFilename);
 
     bool event(QEvent * ev);
+    void refreshAccelName (void);
 
 private slots:
     void play ();

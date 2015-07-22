@@ -24,12 +24,15 @@ EasyDuo::EasyDuo(QWidget *parent)
 
   ui.setupUi(this);
 
+  // display device IP address
   if (0 == network_getIpStr(sIp, "eth0")) {
     ui.lblIpAddress->setText(sIp);
   }
 
+  // load config file
   config_loadMedia(*ui.cbxMedia, "/home/root/easyduo.cfg");
 
+  // initialize MCC
   try {
     m_poMcc = new CMcc(MCC_ENDPOINT_A5_NODE, MCC_ENDPOINT_A5_PORT);
   } catch (...) {
@@ -37,6 +40,10 @@ EasyDuo::EasyDuo(QWidget *parent)
   }
   m_pEasyPlayer = new EasyPlayer();
 
+  // display accelerometer type
+  refreshAccelName();
+
+  // add periodic signal-slot connections
   connect(&m_qTimerAccel, SIGNAL(timeout()), this, SLOT(refreshAccel()));
   connect(&m_qTimerMedia, SIGNAL(timeout()), this, SLOT(refreshMedia()));
 }
@@ -82,6 +89,31 @@ void EasyDuo::play (void)
 
   m_pEasyPlayer->play(qList[0].toString().toStdString().c_str(),
                       ui.chbxLoop->isChecked());
+}
+
+//******************************************************************************
+
+void EasyDuo::refreshAccelName (void)
+{
+  int32_t       i32Type;
+  QString       sName;
+  int           ret;
+
+  if (m_poMcc) {
+    ret = m_poMcc->getAccelType(&i32Type);
+    if (MCC_OK == ret) {
+      printf("getAccelType: %d\n", i32Type);
+      switch (i32Type) {
+      case ACCEL_TYPE_MMA8451Q: sName = "MMA8451Q"; break;
+      case ACCEL_TYPE_MMA8452Q: sName = "MMA8452Q"; break;
+      case ACCEL_TYPE_MMA8453Q: sName = "MMA8453Q"; break;
+      default:                  sName = "unknown";  break;
+      }
+    } else {
+      sName = "N/A";
+    }
+    ui.gbxAccel->setTitle(QString("Accelerometer (").append(sName).append(")"));
+  }
 }
 
 //******************************************************************************

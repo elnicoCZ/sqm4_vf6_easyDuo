@@ -49,6 +49,7 @@ public:
   int setLedOn (void);
   int setLedOff (void);
   int setLedAuto (void);
+  int getAccelType (int32_t * pi32Type);
   int getAccelData (TAccelData * poData);
 
 protected:

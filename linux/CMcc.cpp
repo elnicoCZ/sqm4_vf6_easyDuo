@@ -137,6 +137,29 @@ int CMcc::setLedAuto (void)
 
 //******************************************************************************
 
+int CMcc::getAccelType (int32_t * pi32Type)
+{
+  TMccMsg     oMsg;
+  TMccMsg   * pMsg;
+  int         ret;
+
+  if (!pi32Type) return MCC_INVALID_ARGUMENT;
+
+  oMsg.type = MCCMSG_ACCEL_INFO;
+  ret = this->sendMsg(oMsg);
+  if (MCC_OK != ret) return ret;
+
+  this->recvMsg(&pMsg);
+  if (MCC_OK != ret) return ret;
+
+  *pi32Type = pMsg->iAccelType;
+
+  this->freeMsg(pMsg);
+  return ret;
+}
+
+//******************************************************************************
+
 int CMcc::getAccelData (TAccelData * poData)
 {
   TMccMsg     oMsg;

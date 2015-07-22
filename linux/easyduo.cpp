@@ -28,7 +28,7 @@ EasyDuo::EasyDuo(QWidget *parent)
     ui.lblIpAddress->setText(sIp);
   }
 
-  config_loadMedia(*ui.cbxMedia, "/root/easyduo.cfg");
+  config_loadMedia(*ui.cbxMedia, "/home/root/easyduo.cfg");
 
   try {
     m_poMcc = new CMcc(MCC_ENDPOINT_A5_NODE, MCC_ENDPOINT_A5_PORT);

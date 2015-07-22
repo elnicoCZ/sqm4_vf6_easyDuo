@@ -152,9 +152,9 @@ int CMcc::getAccelData (TAccelData * poData)
   this->recvMsg(&pMsg);
   if (MCC_OK != ret) return ret;
 
-  poData->x = pMsg->iDataX;
-  poData->y = pMsg->iDataY;
-  poData->z = pMsg->iDataZ;
+  poData->x = pMsg->fDataX;
+  poData->y = pMsg->fDataY;
+  poData->z = pMsg->fDataZ;
 
   this->freeMsg(pMsg);
   return ret;

@@ -13,7 +13,7 @@
 #define TIMER_DELAY_MEDIA               (1000)
 
 #define PRG_ACCEL_SHIFT                 (8192)
-#define PRG_ACCEL_SCALE                 (1.0 / 4096.0)
+#define PRG_ACCEL_SCALE                 (4096)
 
 //******************************************************************************
 
@@ -94,7 +94,7 @@ void EasyDuo::refreshAccel (void)
   if (m_poMcc) {
     ret = m_poMcc->getAccelData(&oAccelData);
     if (MCC_OK == ret) {
-//      printf("getAccelData: %d %d %d\n", oAccelData.x, oAccelData.y, oAccelData.z);
+//      printf("getAccelData: %f %f %f\n", oAccelData.x, oAccelData.y, oAccelData.z);
       EasyDuo::prgAccelSetValue(*ui.prgAccelX, oAccelData.x);
       EasyDuo::prgAccelSetValue(*ui.prgAccelY, oAccelData.y);
       EasyDuo::prgAccelSetValue(*ui.prgAccelZ, oAccelData.z);
@@ -122,10 +122,12 @@ void EasyDuo::refreshMedia (void)
 
 //******************************************************************************
 
-void EasyDuo::prgAccelSetValue(QProgressBar & qPrgBar, int val)
+void EasyDuo::prgAccelSetValue(QProgressBar & qPrgBar, float val)
 {
-  qPrgBar.setValue(val + PRG_ACCEL_SHIFT);
-  qPrgBar.setFormat(QString("%1 g").arg(val * PRG_ACCEL_SCALE, 0, 'f', 3));
+  if (val < -2.0f) val = -2.0f;
+  if (val >  2.0f) val =  2.0f;
+  qPrgBar.setValue(val*PRG_ACCEL_SCALE + PRG_ACCEL_SHIFT);
+  qPrgBar.setFormat(QString("%1 g").arg(val, 0, 'f', 3));
 }
 
 //******************************************************************************

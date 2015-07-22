@@ -22,7 +22,7 @@ private:
     QTimer              m_qTimerMedia;
     CMcc              * m_poMcc;
 
-    static void prgAccelSetValue(QProgressBar & qPrgBar, int val);
+    static void prgAccelSetValue(QProgressBar & qPrgBar, float val);
     static void cbxItemEnable(QComboBox & qCombo, int idx, bool bEnable);
     static bool fileExists(const char * sFilename);
 

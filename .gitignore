@@ -1,9 +1,12 @@
 *~
 Thumbs.db
 
+build-*
+
 linux/debug/*
 linux/release/*
 linux/EasyDuo
+linux/EasyDuo.pro.user
 linux/Makefile*
 linux/ui_*.h
 
